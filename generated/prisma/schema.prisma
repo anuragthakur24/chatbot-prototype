@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+
+model User {
+  id        String    @id // e.g. "EMP001", "ADM001"
+  name      String
+  email     String    @unique
+  password  String
+  role      String // "employee" | "admin"
+  dept      String
+  tickets   Ticket[]
+  chatLogs  ChatLog[]
+  createdAt DateTime  @default(now())
+}
+
+// ─────────────────────────────────────────────
+// TICKET
+// ─────────────────────────────────────────────
+
+model Ticket {
+  id         String    @id // e.g. "TKT-1001"
+  empId      String
+  empName    String
+  dept       String
+  category   String
+  priority   String
+  status     String    @default("Open")
+  desc       String
+  resolution String    @default("")
+  assignedTo String?
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  user       User      @relation(fields: [empId], references: [id])
+
+  // FIX #2: Indexes for fast filtered queries
+  @@index([empId]) // employee fetching their own tickets
+  @@index([status]) // admin filtering by status
+  @@index([priority]) // admin filtering by priority
+  @@index([category]) // analytics grouping
+}
+
+// ─────────────────────────────────────────────
+// CHAT LOG
+// ─────────────────────────────────────────────
+
+model ChatLog {
+  id         String   @id @default(cuid())
+  empId      String
+  intent     String
+  message    String
+  response   String
+  confidence Float?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [empId], references: [id])
+
+  @@index([empId]) // fast lookup of chat history per employee
+}
