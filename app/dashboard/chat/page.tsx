@@ -6,7 +6,7 @@ import { Send, Bot, User, Loader2, Sparkles, RefreshCw } from "lucide-react";
 import type { ChatMessage, QuickChip } from "@/types";
 
 // ─────────────────────────────────────────────
-// HELPERS
+// Employee main dashboard component
 // ─────────────────────────────────────────────
 
 function generateId() {
